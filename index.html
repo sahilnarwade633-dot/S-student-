@@ -2,32 +2,278 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>S-Student</title>
+
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#050816;color:#fff;font-family:Arial}
-.top{background:linear-gradient(135deg,#0066ff,#00c6ff);padding:25px;border-radius:0 0 25px 25px}
-.top h1{font-size:35px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;padding:20px}
-.card{background:#111827;border:1px solid #1e90ff;border-radius:18px;padding:25px;text-align:center;font-size:18px}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#050816;color:white;font-family:Arial,sans-serif;}
+.header{
+background:linear-gradient(135deg,#0066ff,#00c6ff);
+padding:25px;
+border-radius:0 0 25px 25px;
+}
+.header h1{font-size:34px;}
+.header p{margin-top:5px;}
+
+.container{padding:18px;}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+}
+
+.card{
+background:#111827;
+border:1px solid #1e90ff;
+border-radius:18px;
+padding:22px;
+text-align:center;
+font-size:18px;
+cursor:pointer;
+transition:.2s;
+}
+.card:active{transform:scale(.96);}
+
+.page{display:none;}
+
+button{
+background:#1e90ff;
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:10px;
+margin:10px 0;
+}
+
+input{
+width:100%;
+padding:10px;
+margin:8px 0;
+background:#111827;
+color:white;
+border:1px solid #1e90ff;
+border-radius:10px;
+}
+
+.item{
+background:#111827;
+padding:10px;
+border-radius:10px;
+margin:8px 0;
+}
+
+.result{
+font-size:28px;
+margin-top:10px;
+color:#00d4ff;
+}
+
+.back{
+background:#333;
+}
 </style>
 </head>
+
 <body>
 
-<div class="top">
+<div class="header">
 <h1>S-Student</h1>
 <p>Learn • Plan • Grow</p>
 </div>
 
+<div class="container">
+
+<div id="home">
+
 <div class="grid">
-<div class="card">📚 Notes</div>
-<div class="card">📊 Attendance</div>
-<div class="card">🎓 CGPA</div>
-<div class="card">📅 Timetable</div>
-<div class="card">✅ To-Do</div>
-<div class="card">👤 Profile</div>
+
+<div class="card" onclick="openPage('notes')">📚<br>Notes</div>
+
+<div class="card" onclick="openPage('attendance')">📊<br>Attendance</div>
+
+<div class="card" onclick="openPage('cgpa')">🎓<br>CGPA</div>
+
+<div class="card" onclick="openPage('todo')">✅<br>To-Do</div>
+
+<div class="card" onclick="openPage('timetable')">📅<br>Timetable</div>
+
+<div class="card" onclick="openPage('profile')">👤<br>Profile</div>
+
 </div>
+</div>
+
+<div id="notes" class="page">
+<button class="back" onclick="goHome()">⬅ Back</button>
+<h2>Notes</h2>
+
+<input id="noteInput" placeholder="Write note">
+
+<button onclick="addNote()">Save</button>
+
+<div id="noteList"></div>
+</div>
+
+<div id="attendance" class="page">
+<button class="back" onclick="goHome()">⬅ Back</button>
+
+<h2>Attendance</h2>
+
+<input id="total" type="number" placeholder="Total Lectures">
+
+<input id="present" type="number" placeholder="Present Lectures">
+
+<button onclick="calculateAttendance()">Calculate</button>
+
+<div id="attendanceResult" class="result">0%</div>
+</div>
+
+<div id="cgpa" class="page">
+<button class="back" onclick="goHome()">⬅ Back</button>
+
+<h2>CGPA</h2>
+
+<input id="s1" type="number" placeholder="Subject 1">
+
+<input id="s2" type="number" placeholder="Subject 2">
+
+<input id="s3" type="number" placeholder="Subject 3">
+
+<input id="s4" type="number" placeholder="Subject 4">
+
+<button onclick="calculateCGPA()">Calculate</button>
+
+<div id="cgpaResult" class="result">0.00</div>
+</div>
+
+<div id="todo" class="page">
+<button class="back" onclick="goHome()">⬅ Back</button>
+
+<h2>To-Do</h2>
+
+<input id="taskInput" placeholder="Enter task">
+
+<button onclick="addTask()">Add Task</button>
+
+<div id="taskList"></div>
+</div>
+
+<div id="timetable" class="page">
+<button class="back" onclick="goHome()">⬅ Back</button>
+
+<h2>Timetable</h2>
+
+<input id="dayInput" placeholder="Day">
+
+<input id="subjectInput" placeholder="Subject">
+
+<button onclick="saveTimetable()">Save</button>
+
+<div id="timeList"></div>
+</div>
+
+<div id="profile" class="page">
+<button class="back" onclick="goHome()">⬅ Back</button>
+
+<h2>Profile</h2>
+
+<p>Name: Sahil</p>
+
+<p>Developer: Sahil</p>
+
+<p>Version: 1.0</p>
+</div>
+
+</div>
+
+<script>
+
+function openPage(id){
+document.getElementById("home").style.display="none";
+
+document.querySelectorAll(".page").forEach(function(p){
+p.style.display="none";
+});
+
+document.getElementById(id).style.display="block";
+}
+
+function goHome(){
+document.querySelectorAll(".page").forEach(function(p){
+p.style.display="none";
+});
+
+document.getElementById("home").style.display="block";
+}
+
+function addNote(){
+let text=document.getElementById("noteInput").value;
+
+if(text=="") return;
+
+document.getElementById("noteList").innerHTML+=
+"<div class='item'>"+text+"</div>";
+
+document.getElementById("noteInput").value="";
+}
+
+function calculateAttendance(){
+
+let total=Number(document.getElementById("total").value);
+
+let present=Number(document.getElementById("present").value);
+
+if(total<=0)return;
+
+let per=(present/total*100).toFixed(1);
+
+document.getElementById("attendanceResult").innerHTML=per+"%";
+}
+
+function calculateCGPA(){
+
+let a=Number(s1.value);
+
+let b=Number(s2.value);
+
+let c=Number(s3.value);
+
+let d=Number(s4.value);
+
+let cg=((a+b+c+d)/4).toFixed(2);
+
+document.getElementById("cgpaResult").innerHTML=cg;
+}
+
+function addTask(){
+
+let t=document.getElementById("taskInput").value;
+
+if(t=="")return;
+
+document.getElementById("taskList").innerHTML+=
+"<div class='item'>☑ "+t+"</div>";
+
+taskInput.value="";
+}
+
+function saveTimetable(){
+
+let day=dayInput.value;
+
+let sub=subjectInput.value;
+
+if(day==""||sub=="")return;
+
+timeList.innerHTML+=
+"<div class='item'>"+day+" - "+sub+"</div>";
+
+dayInput.value="";
+subjectInput.value="";
+}
+
+</script>
 
 </body>
 </html>
