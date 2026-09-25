@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>S-Student</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial;background:#050816;color:#fff}
+#splash{height:100vh;display:flex;justify-content:center;align-items:center;flex-direction:column}
+.logo{width:110px;height:110px;border-radius:28px;background:linear-gradient(135deg,#00d4ff,#0066ff);display:flex;justify-content:center;align-items:center;font-size:60px;font-weight:bold;animation:up 1s infinite alternate}
+@keyframes up{from{transform:scale(1)}to{transform:scale(1.08)}}
+#app{display:none;padding:18px}
+h1,h2{color:#4db8ff;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{background:#111827;border:1px solid #1e90ff;border-radius:18px;padding:22px;text-align:center;font-size:18px}
+.page{display:none}
+input{width:100%;padding:12px;background:#111827;color:#fff;border:1px solid #1e90ff;border-radius:10px;margin:8px 0}
+button{background:#1e90ff;color:#fff;border:none;padding:10px 14px;border-radius:10px;margin:8px 0}
+.item{background:#111827;padding:10px;border-radius:10px;margin:8px 0}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#0b1220;border-top:1px solid #1e90ff;display:flex;justify-content:space-around;padding:10px}
+.nav button{background:none}
+.green{color:#00ff88}.red{color:#ff5a5a}
+</style>
+</head>
+<body>
+
+<div id="splash">
+<div class="logo">S</div>
+<h1>S-Student</h1>
+<p>Learn • Plan • Grow</p>
+</div>
+
+<div id="app">
+<h2 id="welcome"></h2>
+
+<div id="home" class="grid">
+<div class="card" onclick="openPage('notes')">📚<br>Notes</div>
+<div class="card" onclick="openPage('attendance')">📊<br>Attendance</div>
+<div class="card" onclick="openPage('cgpa')">🎓<br>CGPA</div>
+<div class="card" onclick="openPage('time')">📅<br>Timetable</div>
+<div class="card" onclick="openPage('todo')">✅<br>To-Do</div>
+<div class="card" onclick="openPage('profile')">👤<br>Profile</div>
+</div>
+
+<div id="notes" class="page">
+<button onclick="home()">⬅ Back</button>
+<h2>Notes</h2>
+<input id="note" placeholder="Write note">
+<button onclick="addNote()">Add Note</button>
+<div id="noteList"></div>
+</div>
+
+<div id="attendance" class="page">
+<button onclick="home()">⬅ Back</button>
+<h2>Attendance</h2>
+<input id="total" type="number" placeholder="Total Lectures">
+<input id="present" type="number" placeholder="Present Lectures">
+<button onclick="calcAtt()">Calculate</button>
+<h2 id="att">0%</h2>
+<p id="warn"></p>
+</div>
+
+<div id="cgpa" class="page">
+<button onclick="home()">⬅ Back</button>
+<h2>CGPA</h2>
+<input id="m1" type="number" placeholder="Subject 1">
+<input id="m2" type="number" placeholder="Subject 2">
+<input id="m3" type="number" placeholder="Subject 3">
+<input id="m4" type="number" placeholder="Subject 4">
+<button onclick="calcCg()">Calculate</button>
+<h2 id="cg">0.00</h2>
+</div>
+
+<div id="time" class="page">
+<button onclick="home()">⬅ Back</button>
+<h2>Timetable</h2>
+<input id="day" placeholder="Day">
+<input id="sub" placeholder="Subject">
+<button onclick="addTime()">Save</button>
+<div id="timeList"></div>
+</div>
+
+<div id="todo" class="page">
+<button onclick="home()">⬅ Back</button>
+<h2>To-Do</h2>
+<input id="task" placeholder="Task">
+<button onclick="addTask()">Add</button>
+<div id="taskList"></div>
+</div>
+
+<div id="profile" class="page">
+<button onclick="home()">⬅ Back</button>
+<h2>Profile</h2>
+<p id="nameText"></p>
+<p>Developer: Sahil</p>
+<p>Version: 3.0</p>
+</div>
+
+<div class="nav">
+<button onclick="home()">🏠</button>
+<button onclick="openPage('notes')">📚</button>
+<button onclick="openPage('attendance')">📊</button>
+<button onclick="openPage('profile')">👤</button>
+</div>
+
+</div>
+
+<script>
+let name=localStorage.getItem("sst_name")||"Sahil";
+welcome.innerHTML="Welcome "+name+" 👋";
+nameText.innerHTML="Name: "+name;
+
+setTimeout(()=>{
+splash.style.display="none";
+app.style.display="block";
+home();
+load();
+},1500);
+
+function openPage(id){
+document.querySelectorAll(".page").forEach(p=>p.style.display="none");
+homeDiv.style.display="none";
+document.getElementById(id).style.display="block";
+}
+const homeDiv=document.getElementById("home");
+function home(){
+document.querySelectorAll(".page").forEach(p=>p.style.display="none");
+homeDiv.style.display="grid";
+}
+
+function save(){
+localStorage.setItem("notes",noteList.innerHTML);
+localStorage.setItem("todo",taskList.innerHTML);
+localStorage.setItem("time",timeList.innerHTML);
+}
+function load(){
+noteList.innerHTML=localStorage.getItem("notes")||"";
+taskList.innerHTML=localStorage.getItem("todo")||"";
+timeList.innerHTML=localStorage.getItem("time")||"";
+}
+
+function addNote(){
+if(!note.value)return;
+noteList.innerHTML+=`<div class=item>${note.value}</div>`;
+note.value="";save();
+}
+
+function calcAtt(){
+let t=+total.value,p=+present.value;
+if(t<=0||p>t)return;
+let per=(p/t*100).toFixed(1);
+att.innerHTML=per+"%";
+if(per>=75){warn.innerHTML="✅ Safe Attendance";warn.className="green";}
+else{warn.innerHTML="⚠ 75% sathi ajun "+Math.ceil(0.75*t-p)+" lectures attend kar.";warn.className="red";}
+}
+
+function calcCg(){
+let a=[+m1.value,+m2.value,+m3.value,+m4.value];
+cg.innerHTML=(a.reduce((x,y)=>x+y,0)/4).toFixed(2);
+}
+
+function addTime(){
+if(!day.value||!sub.value)return;
+timeList.innerHTML+=`<div class=item>${day.value} - ${sub.value}</div>`;
+day.value="";sub.value="";save();
+}
+
+function addTask(){
+if(!task.value)return;
+taskList.innerHTML+=`<div class=item>${task.value}</div>`;
+task.value="";save();
+}
+</script>
+</body>
+</html>
